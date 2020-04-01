@@ -2,6 +2,7 @@
 /*                                   IMPORTS                                  */
 /* -------------------------------------------------------------------------- */
 /* ------------------------------- THIRD PARTY ------------------------------ */
+console.log(`[APP.TS] - process.env.NODE_ENV- ${process.env.NODE_ENV}`)
 import "reflect-metadata";
 /* --------------------------------- CUSTOM --------------------------------- */
 import { logger, ExpressServer } from "@common";

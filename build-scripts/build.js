@@ -1,12 +1,12 @@
 /* ------------------------------- ENVIRONMENT ------------------------------ */
-const ENVIRONMENT = process.env.NODE_ENV || 'dev';
+const ENVIRONMENT = process.env.NODE_ENV || 'AWS_TEST';
 const FORMATTED_ENVIRONMENT = ENVIRONMENT.toLowerCase().replace('aws_', '')
 console.log(`Performing build for ${ENVIRONMENT} (${FORMATTED_ENVIRONMENT}) environment`);
 const AWS_TARGET = ENVIRONMENT.toLowerCase().includes('aws');
 /* -------------------------------------------------------------------------- */
 /*                                   IMPORTS                                  */
 /* -------------------------------------------------------------------------- */
-const s = require('shelljs'),
+const shell = require('shelljs'),
     resolveRefs = require("json-refs").resolveRefs,
     YAML = require("js-yaml"),
     fs = require("fs"),
@@ -92,17 +92,23 @@ const getSecrets = async () => {
     })
 }
 
-function buildApp() {
+function writeFiles() {
+    const swaggerYamlDest = 'src/common/swagger/Api.yaml'
+    const envDest = '.env'
+
     // Create Swagger Docs
-    fs.writeFileSync('src/common/swagger/Api.yaml', apiYamlContents);
+    fs.writeFileSync(swaggerYamlDest, apiYamlContents);
 
     // Create .env file
     if (AWS_TARGET)
-        fs.writeFileSync('.env', environmentConfig);
+        fs.writeFileSync(envDest, environmentConfig);
 
-    console.log('Build Complete');
+    console.log(`Wrote files ${swaggerYamlDest} ${AWS_TARGET ? ',' + envDest : ''}`)
 }
 
+const complete = () => {
+    console.log('Build Complete');
+}
 
 buildApiYaml()
     .then(_ => console.log('API yaml successfully built'))
@@ -115,7 +121,8 @@ buildApiYaml()
                     console.error(`Failed to retrieve secrets for environment ${ENVIRONMENT}`, err)
                     process.exit(1)
                 })
-                .finally(_ => buildApp())
+                .finally(_ => writeFiles())
         }
-        else buildApp()
+        else writeFiles()
     });
+
