@@ -1,0 +1,32 @@
+get:
+  tags:
+    - Foo
+  summary: Retrieves all foos.
+  responses:
+    200:
+      description: Success
+    404:
+      description: Notfound
+    400:
+      description: Bad Request
+    500:
+      description: Internal Server Error
+post:
+  tags:
+    - Foo
+  summary: Creates a new foo.
+  consumes:
+    - application/json
+  parameters:
+    - in: body
+      name: foo
+      description: The foo to create.
+      schema:
+        $ref: "#/definitions/Foo"
+  responses:
+    200:
+      description: OK
+    201:
+      description: CREATED
+    500:
+      description: Internal Server Error

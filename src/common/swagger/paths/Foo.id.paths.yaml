@@ -1,0 +1,56 @@
+get:
+  tags:
+    - Foo
+  summary: Retrieves a single foo by id.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the Foo to retrieve.
+      type: string 
+  responses:
+    200:
+      description: Return the foo with the specified id
+    404:
+      description: Foo not found
+    500:
+      description: Internal Server Error
+put:
+  tags:
+    - Foo
+  summary: Updates foo.
+  consumes:
+    - application/json
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the Foo to update.
+      type: string 
+    - in: body
+      name: foo
+      description: The foo to update.
+      schema:
+        $ref: "#/definitions/Foo"
+  responses:
+    200:
+      description: OK
+    500:
+      description: Internal Server Error
+delete:
+  tags:
+    - Foo
+  summary: Deletes a single foo by id.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the Foo to delete.
+      type: string 
+  responses:
+    204:
+      description: No Content
+    404:
+      description: Foo not found
+    500:
+      description: Internal Server Error

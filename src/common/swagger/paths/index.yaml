@@ -1,0 +1,9 @@
+# paths
+/todoitems:
+  $ref: ./TodoItem.paths.yaml
+/todoitems/{id}:
+  $ref: ./TodoItem.id.paths.yaml
+/foos:
+  $ref: ./Foo.paths.yaml
+/foos/{id}:
+  $ref: ./Foo.id.paths.yaml

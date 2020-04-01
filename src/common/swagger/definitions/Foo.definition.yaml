@@ -1,0 +1,9 @@
+type: object
+required:
+
+
+properties:
+    someInt:
+        type: number
+    someString:
+        type: string

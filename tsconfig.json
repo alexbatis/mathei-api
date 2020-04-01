@@ -1,0 +1,46 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "node_modules/*",
+                "src/types/*"
+            ],
+            "@models": [
+                "./src/models"
+            ],
+            "@controllers": [
+                "./src/api/controllers"
+            ],
+            "@services": [
+                "./src/api/services"
+            ],
+            "@graphQL": [
+                "src/api/graphql"
+            ],
+            "@common": [
+                "./src/common"
+            ],
+            "@base": [
+                "./src"
+            ]
+        }
+    },
+    "include": [
+        "typings.d.ts",
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

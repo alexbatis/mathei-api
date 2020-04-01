@@ -1,0 +1,32 @@
+get:
+  tags:
+    - TodoItem
+  summary: Retrieves all todoitems.
+  responses:
+    200:
+      description: Success
+    404:
+      description: Notfound
+    400:
+      description: Bad Request
+    500:
+      description: Internal Server Error
+post:
+  tags:
+    - TodoItem
+  summary: Creates a new todoitem.
+  consumes:
+    - application/json
+  parameters:
+    - in: body
+      name: todoitem
+      description: The todoitem to create.
+      schema:
+        $ref: "#/definitions/TodoItem"
+  responses:
+    200:
+      description: OK
+    201:
+      description: CREATED
+    500:
+      description: Internal Server Error

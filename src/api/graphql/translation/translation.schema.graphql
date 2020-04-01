@@ -1,0 +1,48 @@
+input PaginationOpts {
+  start: Int
+  limit: Int
+  searchText: String
+  sortBy: String
+  sortDir: String
+}
+
+type Translation {
+  id: ID
+  lesson: Lesson
+  phrase: String!
+  translated: String!
+  phonetic: String
+  type: String
+  createdAt: Date
+  tags: [String]
+}
+
+input CreateTranslationInput {
+  lesson : ID
+  phrase: String!
+  translated: String!
+  phonetic: String
+  type : String
+}
+
+input UpdateTranslationInput {
+  lesson : ID
+  phrase: String
+  translated: String
+  phonetic: String
+  type : String
+}
+
+
+extend type Query {
+  translations: [Translation]
+  paginatedTranslations(opts: PaginationOpts) : [Translation]
+  translation(id: ID!): Translation
+  # translation(lesson: ID!): Translation
+}
+
+extend type Mutation {
+  createTranslation(translation: CreateTranslationInput): Translation,
+  updateTranslation(id : ID!, translation: UpdateTranslationInput): Translation
+  deleteTranslation(id : ID!): Translation
+}

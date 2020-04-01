@@ -1,0 +1,8 @@
+swagger: '2.0'
+info:
+  $ref: src/common/swagger/info/index.yaml
+basePath: /api/v1
+definitions:
+  $ref: src/common/swagger/definitions/index.yaml
+paths:
+  $ref: src/common/swagger/paths/index.yaml

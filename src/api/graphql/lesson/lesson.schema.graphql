@@ -1,0 +1,54 @@
+scalar Date
+
+# type Translation {
+#   id: ID
+#   lessonId: [ID]
+#   phrase: String!
+#   translated: String!
+#   phonetic: String
+#   type: String!
+# }
+
+type Lesson {
+  id: ID!
+  name: String!
+  user: ID!
+  lessons: [ID]
+  translations: [Translation]
+  resources: [String]
+  tags: [String]
+  createdAt: Date
+}
+
+input CreateLessonInput {
+  name: String!
+  resources: [String]
+  translations: [LessonTranslationInput]
+}
+
+input LessonTranslationInput {
+  id: ID
+  phrase: String!
+  translated: String!
+  phonetic: String
+  type: String
+  tags: [String]
+}
+
+input UpdateLessonInput {
+  id: ID
+  name: String
+  translations: [LessonTranslationInput]
+}
+
+
+extend type Query {
+  lessons: [Lesson]
+  lesson(id: ID!): Lesson
+}
+
+extend type Mutation {
+  createLesson(lesson: CreateLessonInput): Lesson,
+  updateLesson(id: ID!, lesson: UpdateLessonInput): Lesson
+  deleteLesson(id: ID!): Lesson
+}

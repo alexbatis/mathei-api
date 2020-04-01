@@ -1,0 +1,30 @@
+type Query {
+  messages: [Message]
+  todoItems : [TodoItem]
+}
+
+type TodoItem {
+  id: ID!
+  description: String!
+  completed: Boolean!
+}
+
+
+type Mutation {
+  addMessage(input: MessageInput!): Message
+}
+
+type Subscription {
+  messageAdded : Message
+}
+
+type Message {
+  id: ID!
+  from: String 
+  text: String
+}
+
+input MessageInput {
+  text: String
+}
+

@@ -1,0 +1,12 @@
+/*
+    Do not modify any of the generated lines of code in this file
+    as this may result in the inability for the generator to
+    perform model generation after initial app configuration
+*/
+
+
+export * from "./TodoItem";
+export * from "./Foo";
+export * from "./Lesson";
+export * from "./Translation";
+export * from "./User";

@@ -1,0 +1,5 @@
+# definitions
+TodoItem:
+  $ref: ./TodoItem.definition.yaml
+Foo:
+  $ref: ./Foo.definition.yaml

@@ -1,0 +1,56 @@
+get:
+  tags:
+    - TodoItem
+  summary: Retrieves a single todoitem by id.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the TodoItem to retrieve.
+      type: string 
+  responses:
+    200:
+      description: Return the todoitem with the specified id
+    404:
+      description: TodoItem not found
+    500:
+      description: Internal Server Error
+put:
+  tags:
+    - TodoItem
+  summary: Updates todoitem.
+  consumes:
+    - application/json
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the TodoItem to update.
+      type: string 
+    - in: body
+      name: todoitem
+      description: The todoitem to update.
+      schema:
+        $ref: "#/definitions/TodoItem"
+  responses:
+    200:
+      description: OK
+    500:
+      description: Internal Server Error
+delete:
+  tags:
+    - TodoItem
+  summary: Deletes a single todoitem by id.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The id of the TodoItem to delete.
+      type: string 
+  responses:
+    204:
+      description: No Content
+    404:
+      description: TodoItem not found
+    500:
+      description: Internal Server Error
