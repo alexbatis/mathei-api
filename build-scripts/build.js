@@ -111,7 +111,10 @@ buildApiYaml()
         if (AWS_TARGET) {
             getSecrets()
                 .then(_ => console.log(`Secrets retrieved for environment ${ENVIRONMENT}`))
-                .catch(err => console.log(`Failed to retrieve secrets for environment ${ENVIRONMENT}`, err))
+                .catch(err => {
+                    console.error(`Failed to retrieve secrets for environment ${ENVIRONMENT}`, err)
+                    process.exit(1)
+                })
                 .finally(_ => buildApp())
         }
         else buildApp()
