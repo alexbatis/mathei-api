@@ -1,11 +1,25 @@
-const s = require('shelljs');
-const resolveRefs = require("json-refs").resolveRefs;
-const YAML = require("js-yaml");
-const fs = require("fs");
-const program = require("commander");
-const path = require("path");
-
-let apiYamlContents = "";
+/* ------------------------------- ENVIRONMENT ------------------------------ */
+const ENVIRONMENT = process.env.NODE_ENV || 'dev';
+const FORMATTED_ENVIRONMENT = ENVIRONMENT.toLowerCase().replace('aws_', '')
+console.log(`Performing build for ${ENVIRONMENT} (${FORMATTED_ENVIRONMENT}) environment`);
+const AWS_TARGET = ENVIRONMENT.toLowerCase().includes('aws');
+/* -------------------------------------------------------------------------- */
+/*                                   IMPORTS                                  */
+/* -------------------------------------------------------------------------- */
+const s = require('shelljs'),
+    resolveRefs = require("json-refs").resolveRefs,
+    YAML = require("js-yaml"),
+    fs = require("fs"),
+    program = require("commander"),
+    path = require("path"),
+    AWS = require('aws-sdk'),
+    region = process.env.AWS_REGION || "us-east-2",
+    environmentSecretName = `${FORMATTED_ENVIRONMENT}/mathei-api/.env`;
+let
+    secret,
+    decodedBinarySecret,
+    apiYamlContents = "",
+    environmentConfig = "";
 
 function buildApiYaml() {
     return new Promise((resolve, reject) => {
@@ -52,26 +66,53 @@ function buildApiYaml() {
     });
 }
 
+const getSecrets = async () => {
+    return new Promise((resolve, reject) => {
+        // Create a Secrets Manager client
+        var client = new AWS.SecretsManager({
+            region: region
+        });
+
+        client.getSecretValue({ SecretId: environmentSecretName }, function (err, data) {
+            if (err) return reject(err)
+
+            // Decrypts secret using the associated KMS CMK.
+            // Depending on whether the secret is a string or binary, one of these fields will be populated.
+            if ('SecretString' in data) {
+                secret = data.SecretString;
+                environmentConfig = secret
+                resolve(secret)
+            } else {
+                let buff = new Buffer(data.SecretBinary, 'base64');
+                decodedBinarySecret = buff.toString('ascii');
+                environmentConfig = decodedBinarySecret
+                resolve(decodedBinarySecret)
+            }
+        });
+    })
+}
+
 function buildApp() {
-    s.rm('-rf', 'build');
-    s.mkdir('build');
-    s.cp('environments/local.env', 'build/.env');
-    s.cp('environments/local.env', '.env');
-    s.cp('-R', 'public', 'build/public');
+    // Create Swagger Docs
     fs.writeFileSync('src/common/swagger/Api.yaml', apiYamlContents);
-    s.mkdir('-p', 'build/src/common/swagger');
-    fs.writeFileSync('build/src/common/swagger/Api.yaml', apiYamlContents);
-    s.cp('-R', 'package.json', 'build/package.json');
+
+    // Create .env file
+    if (AWS_TARGET)
+        fs.writeFileSync('.env', environmentConfig);
+
     console.log('Build Complete');
 }
 
-buildApiYaml().then(
-    (value => {
-        console.log('API yaml successfully built');
-        buildApp();
-    }),
-    (error => {
-        console.error('ERROR: Could not build API yaml', error);
-        buildApp();
-    }),
-);
+
+buildApiYaml()
+    .then(_ => console.log('API yaml successfully built'))
+    .catch(err => console.error('Failed to build API yaml', err))
+    .finally(_ => {
+        if (AWS_TARGET) {
+            getSecrets()
+                .then(_ => console.log(`Secrets retrieved for environment ${ENVIRONMENT}`))
+                .catch(err => console.log(`Failed to retrieve secrets for environment ${ENVIRONMENT}`, err))
+                .finally(_ => buildApp())
+        }
+        else buildApp()
+    });

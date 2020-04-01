@@ -51,7 +51,7 @@ export class ExpressServer {
       // File path configurations
       const root = path.normalize(__dirname + "/../..");
       app.set("appPath", root + "client");
-      app.use("/docs", express.static(`${root}/public/api-explorer`));
+      app.use("/docs", express.static(`${root}/swagger/api-explorer`));
       // Body & cookie parsers
       app.use(
         bodyParser.json(),
