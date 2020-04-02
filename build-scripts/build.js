@@ -1,5 +1,5 @@
 /* ------------------------------- ENVIRONMENT ------------------------------ */
-const ENVIRONMENT = process.env.NODE_ENV || 'AWS_TEST';
+const ENVIRONMENT = process.env.NODE_ENV || 'dev';
 const FORMATTED_ENVIRONMENT = ENVIRONMENT.toLowerCase().replace('aws_', '')
 console.log(`Performing build for ${ENVIRONMENT} (${FORMATTED_ENVIRONMENT}) environment`);
 const AWS_TARGET = ENVIRONMENT.toLowerCase().includes('aws');
