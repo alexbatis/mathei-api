@@ -43,7 +43,7 @@ export class DuoLingoImportService {
     const map = {}
     await asyncForEach(vocabularyList, async (vocabEntry) => {
       const skill = languageData[languageKey].skills.find(skill => skill.name === vocabEntry.skill)
-      const existingLessons = await this.lessonService.byQuery({ importKey: skill.id })
+      const existingLessons = await this.lessonService.byQuery({ user: user._id, importKey: skill.id })
       if (existingLessons.length) return
 
       const lexeme = await this.getLexeme(vocabEntry.lexeme_id, jwt)
@@ -59,14 +59,14 @@ export class DuoLingoImportService {
         translated: vocabEntry["word_string"],
         phonetic: vocabEntry["normalized_string"],
         phrase: lexeme["translations"],
-        tags : []
+        tags: []
       })
 
       lexeme["alternative_forms"].forEach(alternativeForm => {
         map[skill.id].words.push({
           translated: alternativeForm["text"],
           phrase: alternativeForm["translation_text"],
-          tags : ["exercise"]
+          tags: ["exercise"]
         })
         console.log(`mapped ${alternativeForm["text"]} to skill ${skill.id}`)
       })
@@ -107,7 +107,7 @@ export class DuoLingoImportService {
     await Promise.all(importOperations)
     return {
       lessonsCreated: importOperations.length,
-      translationsCreated : translationsCount
+      translationsCreated: translationsCount
     }
   }
 

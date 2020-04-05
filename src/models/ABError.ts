@@ -11,5 +11,7 @@ export class ABError {
         this.message = err && err.message || null;
         this.status = err && err.status || 500;
         this.error = err && err.error || null;
+        if (!this.message && typeof this.error === 'string')
+            this.message = this.error
     }
 }
