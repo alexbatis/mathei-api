@@ -28,9 +28,13 @@ export class UserService {
   async update(id: string, updatedUser: User): Promise<User> {
     const existingUser: User = await UserModel.findById(id);
     if (!existingUser) throw new ABError({ "status": 404, "error": `Could not retrieve user with id ${id}` });
-    const updatedUserToValidate = new User(existingUser);
-    await updatedUserToValidate.updateAndValidate(updatedUser);
-    const user: User = await UserModel.findByIdAndUpdate(id, updatedUserToValidate, { new: true });
+    if (existingUser.authType === 'GOOGLE')
+      delete existingUser.email
+
+    const validatedUser = await existingUser.updateAndValidate(updatedUser)
+    // const updatedUserToValidate = new User(existingUser);
+    // await updatedUserToValidate.updateAndValidate(updatedUser);
+    const user: User = await UserModel.findByIdAndUpdate(id, validatedUser, { new: true });
     return user;
   }
 
