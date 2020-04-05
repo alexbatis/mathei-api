@@ -87,7 +87,7 @@ export class User {
     const errors = await validate(updatedObject);
     if (errors.length) throw errors;
     Object.assign(this, updatedTranslation);
-    return true;
+    return this;
   }
 
   setPassword(password: string) {
