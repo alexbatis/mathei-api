@@ -2,7 +2,7 @@
 /*                                   IMPORTS                                  */
 /* -------------------------------------------------------------------------- */
 /* ------------------------------- THIRD PARTY ------------------------------ */
-import { interfaces, controller, httpGet, request, response, next } from "inversify-express-utils";
+import { interfaces, controller, httpGet, request, response, next, httpPut } from "inversify-express-utils";
 import { httpPost } from "inversify-express-utils";
 import { inject } from "inversify";
 /* --------------------------------- CUSTOM --------------------------------- */
@@ -26,12 +26,21 @@ export class AuthController implements interfaces.Controller {
   async register(@request() req, @response() res) {
     const { body: { password } } = req;
     try {
-      const _user = new User(req.body, password);
-      const user = await this.userService.create(_user, password);
-      return res.json(user.toAuthJSON());
-    } catch (error) {
-      return res.json({ error }).status(500);
-    }
+      const existingUser = await this.userService.byEmail(req.body.email)
+      if (existingUser && existingUser.validatePassword(password))
+        return existingUser.toAuthJSON()
+    } catch (err) { /* no user found, just continue to registration */ }
+
+    const _user = new User(req.body, password);
+    const user = await this.userService.create(_user, password);
+    return res.json(user.toAuthJSON());
+  }
+
+  @httpPut("/update", auth.required)
+  async updateProfileInfo(@request() req, @response() res) {
+    const _user = new User(req.body);
+    const user = await this.userService.update(req.user.id, _user)
+    return res.json(user.toAuthJSON());
   }
 
   /* ------------------------------ AUTHENTICATE ------------------------------ */
