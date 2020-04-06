@@ -25,7 +25,6 @@ export class TranslationResolver {
       Query: {
         translations: checkAuth((_, _1, { user }: { user?: User }) => this.getTranslations(user._id)),
         paginatedTranslations: checkAuth((_, { opts }, { user }: { user?: User }) => {
-          console.log('sdf')
           return this.getTranslations(user._id, opts)
         }),
         translation: checkAuth((_, { id }) => this.getTranslation(id))

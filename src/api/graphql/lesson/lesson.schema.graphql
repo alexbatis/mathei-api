@@ -39,6 +39,7 @@ input UpdateLessonInput {
   id: ID
   name: String
   translations: [LessonTranslationInput]
+  resources: [String]
 }
 
 

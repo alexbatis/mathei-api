@@ -25,12 +25,15 @@ export class AuthController implements interfaces.Controller {
   @httpPost("/register")
   async register(@request() req, @response() res) {
     const { body: { password } } = req;
+<<<<<<< HEAD
     try {
       const existingUser = await this.userService.byEmail(req.body.email)
       if (existingUser && existingUser.validatePassword(password))
         return existingUser.toAuthJSON()
     } catch (err) { /* no user found, just continue to registration */ }
 
+=======
+>>>>>>> 925e5e85ff99b76fe05a4d73d1a129b56b1d1880
     const _user = new User(req.body, password);
     const user = await this.userService.create(_user, password);
     return res.json(user.toAuthJSON());
