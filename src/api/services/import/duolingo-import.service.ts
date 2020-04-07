@@ -27,23 +27,27 @@ export class DuoLingoImportService {
 
   async import(duoEmail: string, duoPassword: string, user: User) {
     // Login to DuoLingo
+    console.log("Authenticating DuoLingo user...")
     const jwt = await this.duoLingoLogin(duoEmail, duoPassword)
-    const headers = { 'Authorization': 'Bearer ' + jwt }
+    const headers = { "Authorization": "Bearer " + jwt }
 
     // Get DuoLingo user info
+    console.log("Extracting Duolingo profile data for import")
     const userInfo = await axios.get(userInfoUrl + duoEmail, { headers })
     const languageTo: string = userInfo.data.ui_language
     const languageData = userInfo.data.language_data
 
     // Get DuoLingo vocabulary overview
+    console.log("Pulling a list of all of the Duolingo user's words")
     const vocabularyOverviewResponse = await axios.get(vocabularyOverviewUrl, { headers })
     const languageKey: string = vocabularyOverviewResponse.data.learning_language
     const vocabularyList: Array<object> = vocabularyOverviewResponse.data.vocab_overview
 
+    console.log("Proessing")
     const map = {}
     await asyncForEach(vocabularyList, async (vocabEntry) => {
       const skill = languageData[languageKey].skills.find(skill => skill.name === vocabEntry.skill)
-      const existingLessons = await this.lessonService.byQuery({ user: user._id, importKey: skill.id })
+      const existingLessons = await this.lessonService.byQuery({ user: user._id, importKey: skill?.id })
       if (existingLessons.length) return
 
       const lexeme = await this.getLexeme(vocabEntry.lexeme_id, jwt)
@@ -68,10 +72,10 @@ export class DuoLingoImportService {
           phrase: alternativeForm["translation_text"],
           tags: ["exercise"]
         })
-        console.log(`mapped ${alternativeForm["text"]} to skill ${skill.id}`)
+        console.log(`mapped ${alternativeForm["text"]} - (${alternativeForm["translation_text"]})`)
       })
 
-      console.log(`mapped ${vocabEntry["word_string"]} to skill ${skill.id}`)
+      console.log(`mapped ${vocabEntry["word_string"]} - ${lexeme["translations"]}`)
     })
 
     let translationsCount = 0;
@@ -105,6 +109,7 @@ export class DuoLingoImportService {
     })
 
     await Promise.all(importOperations)
+    console.log("Duolingo import complete!")
     return {
       lessonsCreated: importOperations.length,
       translationsCreated: translationsCount
