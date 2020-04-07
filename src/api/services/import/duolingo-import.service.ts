@@ -76,7 +76,7 @@ export class DuoLingoImportService {
 
     let translationsCount = 0;
     const importOperations = Object.keys(map).map(async (skillId) => {
-      const existingLessons = await this.lessonService.byQuery({ importKey: skillId })
+      const existingLessons = await this.lessonService.byQuery({ user: user._id, importKey: skillId })
       if (existingLessons.length) return
       const skill = map[skillId]
       const lesson = new Lesson({
