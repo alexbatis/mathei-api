@@ -10,8 +10,7 @@ const GoogleTokenStrategy = require("passport-google-token").Strategy;
 import * as jwt from "jsonwebtoken";
 import * as expressJwt from "express-jwt";
 /* --------------------------------- CUSTOM --------------------------------- */
-import { User, ABError } from "@models";
-import { UserModel } from "@models";
+import {AuthRole, UserModel } from "@models";
 import { UserService } from "@services";
 const userService = new UserService();
 
@@ -124,6 +123,14 @@ export const auth = {
     if (!token) return null
     const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
     return userService.byEmail(decodedUser["email"]);
-
+  },
+  checkHasRole: (roles: Array<AuthRole>) => async (req, res, next) => {
+    try {
+      const user = await userService.byID(req.user.id)
+      const hasRole = user.roles.filter(x => roles.includes(x)).length !== 0;
+      return (hasRole) ? next() : res.send('Unauthorized').status(401)
+    } catch (e) {
+      return res.send('Unauthorized').status(401)
+    }
   }
 };
