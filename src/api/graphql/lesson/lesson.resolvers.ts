@@ -5,8 +5,10 @@
 import { injectable } from 'inversify';
 /* --------------------------------- CUSTOM --------------------------------- */
 import { LessonService, TranslationService } from "@services";
-import { Lesson, User, Translation } from "@models";
-import { checkAuth } from "../utils";
+import { Lesson, User, Translation, AuthRole, LessonModel } from "@models";
+import { checkAuth, checkHasRole } from "../utils";
+import { UserInputError } from 'apollo-server-express';
+import { asyncForEach } from '@common';
 const lessonService = new LessonService();
 const translationService = new TranslationService();
 
@@ -29,6 +31,7 @@ export class LessonsResolver {
       Mutation: {
         createLesson: checkAuth((root, { lesson }, { user }: { user?: User }) => this.createLesson(lesson, user._id)),
         updateLesson: checkAuth((root, { id, lesson }, { user }: { user?: User }) => this.updateLesson(lesson, id, user._id)),
+        copyDemoLessons: checkHasRole([AuthRole.ADMIN], (root, { tags, toUser }, { user }) => this.copyDemoLessons(toUser, tags)),
         deleteLesson: checkAuth((root, { id }, { user }: { user?: User }) => this.deleteLesson(id))
       },
       Lesson: {
@@ -38,6 +41,45 @@ export class LessonsResolver {
   }
 
   /* ----------------------------- LESSON QUERIES ----------------------------- */
+  private async copyDemoLessons(toUser: string, tags?: Array<string>) {
+    try {
+      const $match: any = { 'user.roles': { "$in": [AuthRole.DEMO] } }
+      if (tags?.length) $match.tags = { "$in": tags }
+      const $lookup = { from: 'users', localField: 'user', foreignField: '_id', as: 'user' }
+      const $unwind = { path: '$user' };
+      const demoLessons = await LessonModel.aggregate([{ $lookup }, { $unwind }, { $match }])
+      const existingLessons = await lessonService.byQuery({
+        $and: [
+          { user: toUser },
+          { from: { $in: demoLessons.map(demoLesson => demoLesson._id) } }
+        ]
+      })
+
+      const deleteOpts = existingLessons.map(lesson => this.deleteLesson(lesson.id))
+      await Promise.all(deleteOpts)
+
+      await asyncForEach(demoLessons, async (lesson, i) => {
+        demoLessons[i].from = demoLessons[i]._id
+        demoLessons[i].translations = await translationService.byLessonID(demoLessons[i]._id)
+        for (let j = 0; j < demoLessons[i].translations.length; j++) {
+          demoLessons[i].translations[j] = JSON.parse(JSON.stringify(demoLessons[i].translations[j]))
+          delete demoLessons[i].translations[j].id;
+          delete demoLessons[i].translations[j]._id;
+          demoLessons[i].translations[j].user = toUser;
+          delete demoLessons[i].translations[j].lesson;
+        }
+        delete demoLessons[i].id;
+        delete demoLessons[i]._id;
+        demoLessons[i].user = toUser;
+      })
+
+      const ops = demoLessons.map(lesson => this.createLesson(lesson, toUser))
+      const results = await Promise.all(ops)
+      return results;
+    }
+    catch (e) { throw new UserInputError(e.message, { error: e }); }
+  }
+
   private async getLessons(userId: string) {
     return lessonService.byUserId(userId)
   }

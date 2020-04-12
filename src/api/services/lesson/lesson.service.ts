@@ -50,6 +50,11 @@ export class LessonService {
         return lesson;
     }
 
+    async deleteBy(query: object): Promise<number> {
+        const lessons = await LessonModel.deleteMany(query)
+        return lessons.deletedCount;
+    }
+
     async validateLesson(lesson: any) {
         const lessonToValidate = new Lesson(lesson);
         try { await lessonToValidate.validateInstance(); }

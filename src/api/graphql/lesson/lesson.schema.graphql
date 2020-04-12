@@ -51,5 +51,6 @@ extend type Query {
 extend type Mutation {
   createLesson(lesson: CreateLessonInput): Lesson,
   updateLesson(id: ID!, lesson: UpdateLessonInput): Lesson
+  copyDemoLessons(tags: [String], toUser: ID!): [Lesson]
   deleteLesson(id: ID!): Lesson
 }

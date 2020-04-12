@@ -8,11 +8,18 @@ import { validate, IsNotEmpty, IsString, IsEmail, IsOptional } from "class-valid
 import { ObjectId } from "bson";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
+import { IsArray } from 'class-validator';
 
 
 export enum AuthType {
   BASIC = "basic",
   GOOGLE = "google"
+}
+
+export enum AuthRole {
+  ADMIN = "admin",
+  DEMO = "demo",
+  READ_ONLY = "read_only"
 }
 
 /* -------------------------------------------------------------------------- */
@@ -65,6 +72,11 @@ export class User {
   @JsonProperty("authType", String)
   @prop()
   authType: string = AuthType.BASIC;
+
+  @IsArray()
+  @JsonProperty("roles", String)
+  @prop()
+  roles: Array<AuthRole> = [];
 
 
   /* ------------------------------- CONSTRUCTOR ------------------------------ */

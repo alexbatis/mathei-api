@@ -23,6 +23,7 @@ export class Lesson {
 
     /* ---------------------------- MEMBER VARIABLES ---------------------------- */
     readonly _id: ObjectId;
+    readonly id: ObjectId;
 
     @IsNotEmpty()
     // @IsMongoId()
@@ -58,6 +59,10 @@ export class Lesson {
     @IsString()
     @prop()
     languageCode?: string;
+
+    @IsOptional()
+    @prop({ ref: Lesson, index: true })
+    from?: Ref<Lesson>;
 
 
     /* ------------------------------- CONSTRUCTOR ------------------------------ */
