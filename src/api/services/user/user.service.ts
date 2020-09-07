@@ -43,9 +43,13 @@ export class UserService {
     const validatedUser = await existingUser.updateAndValidate(updatedUser);
     // const updatedUserToValidate = new User(existingUser);
     // await updatedUserToValidate.updateAndValidate(updatedUser);
-    const user: User = (await UserModel.findByIdAndUpdate(id, validatedUser, {
-      new: true,
-    })) as User;
+
+    const user = UserModel.findByIdAndUpdate(
+      id,
+      { ...validatedUser },
+      { new: true }
+    );
+
     return user;
   }
 
