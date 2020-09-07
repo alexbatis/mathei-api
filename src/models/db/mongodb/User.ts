@@ -4,28 +4,33 @@
 /* ------------------------------- THIRD PARTY ------------------------------ */
 import { prop, getModelForClass, index } from "@typegoose/typegoose";
 import { JsonObject, JsonProperty } from "json2typescript";
-import { validate, IsNotEmpty, IsString, IsEmail, IsOptional } from "class-validator";
+import {
+  validate,
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  IsOptional,
+} from "class-validator";
 import { ObjectId } from "bson";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
-import { IsArray } from 'class-validator';
-
+import { IsArray } from "class-validator";
 
 export enum AuthType {
   BASIC = "basic",
-  GOOGLE = "google"
+  GOOGLE = "google",
 }
 
 export enum AuthRole {
   ADMIN = "admin",
   DEMO = "demo",
-  READ_ONLY = "read_only"
+  READ_ONLY = "read_only",
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              CLASS DEFINITION                              */
 /* -------------------------------------------------------------------------- */
-@JsonObject
+@JsonObject("User")
 export class User {
   /* ---------------------------- MEMBER VARIABLES ---------------------------- */
   readonly _id: ObjectId;
@@ -47,7 +52,6 @@ export class User {
   @JsonProperty("email", String)
   @prop({ unique: true, index: true })
   email: string;
-
 
   @IsNotEmpty()
   @IsString()
@@ -78,7 +82,6 @@ export class User {
   @prop()
   roles: Array<AuthRole> = [];
 
-
   /* ------------------------------- CONSTRUCTOR ------------------------------ */
   constructor(user?: Partial<User>, password?: string) {
     if (password) {
@@ -104,11 +107,15 @@ export class User {
 
   setPassword(password: string) {
     this.salt = crypto.randomBytes(16).toString("hex");
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString("hex");
+    this.hash = crypto
+      .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
+      .toString("hex");
   }
 
   validatePassword(password) {
-    const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString("hex");
+    const hash = crypto
+      .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
+      .toString("hex");
     return this.hash === hash;
   }
 
@@ -118,27 +125,33 @@ export class User {
     const expirationDate = new Date(today);
     // expirationDate.setSeconds(today.getSeconds() + 15);
     expirationDate.setDate(today.getDate() + 30);
-    return jwt.sign({
-      email: this.email,
-      firstName : this.firstName,
-      lastName : this.lastName,
-      id: this._id,
-      _id: this._id,
-      avatar : this.avatar,
-      exp: parseInt((expirationDate.getTime() / 1000).toString(), 10),
-    }, process.env.JWT_SECRET);
+    return jwt.sign(
+      {
+        email: this.email,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        id: this._id,
+        _id: this._id,
+        avatar: this.avatar,
+        exp: parseInt((expirationDate.getTime() / 1000).toString(), 10),
+      },
+      process.env.JWT_SECRET
+    );
   }
 
   generateRefreshToken() {
     const today = new Date();
     const expirationDate = new Date(today);
     expirationDate.setDate(today.getDate() + 30);
-    return jwt.sign({
-      email: this.email,
-      id: this._id,
-      _id: this._id,
-      exp: parseInt((expirationDate.getTime() / 1000).toString(), 10),
-    }, process.env.JWT_SECRET);
+    return jwt.sign(
+      {
+        email: this.email,
+        id: this._id,
+        _id: this._id,
+        exp: parseInt((expirationDate.getTime() / 1000).toString(), 10),
+      },
+      process.env.JWT_SECRET
+    );
   }
 
   toAuthJSON() {
@@ -148,13 +161,14 @@ export class User {
       firstName: this.firstName,
       lastName: this.lastName,
       authType: this.authType,
-      avatar : this.avatar,
+      avatar: this.avatar,
       token: this.generateJWT(),
-      refreshToken: this.generateRefreshToken()
+      refreshToken: this.generateRefreshToken(),
     };
   }
 }
 
-
 /* ----------------------------- TYPEGOOSE MODEL ---------------------------- */
-export const UserModel = getModelForClass(User, { schemaOptions: { timestamps: true } });
+export const UserModel = getModelForClass(User, {
+  schemaOptions: { timestamps: true },
+});
