@@ -6,35 +6,46 @@ import { injectable } from "inversify";
 /* --------------------------------- CUSTOM --------------------------------- */
 import { User, UserModel, ABError } from "@models";
 
-
 /* -------------------------------------------------------------------------- */
 /*                             SERVICE DEFINITION                             */
 /* -------------------------------------------------------------------------- */
 @injectable()
 export class UserService {
-
   async byID(id): Promise<User> {
     const user: User = await UserModel.findById(id);
-    if (!user) throw new ABError({ "status": 404, "error": `Could not retrieve user with id ${id}` });
+    if (!user)
+      throw new ABError({
+        status: 404,
+        error: `Could not retrieve user with id ${id}`,
+      });
     return user;
   }
 
   async byEmail(email): Promise<User> {
     const user: User = await UserModel.findOne({ email });
-    if (!user) throw new ABError({ "status": 404, "error": `Could not retrieve user with email ${email}` });
+    if (!user)
+      throw new ABError({
+        status: 404,
+        error: `Could not retrieve user with email ${email}`,
+      });
     return user;
   }
 
   async update(id: string, updatedUser: User): Promise<User> {
     const existingUser: User = await UserModel.findById(id);
-    if (!existingUser) throw new ABError({ "status": 404, "error": `Could not retrieve user with id ${id}` });
-    if (existingUser.authType === 'GOOGLE')
-      delete existingUser.email
+    if (!existingUser)
+      throw new ABError({
+        status: 404,
+        error: `Could not retrieve user with id ${id}`,
+      });
+    if (existingUser.authType === "GOOGLE") delete existingUser.email;
 
-    const validatedUser = await existingUser.updateAndValidate(updatedUser)
+    const validatedUser = await existingUser.updateAndValidate(updatedUser);
     // const updatedUserToValidate = new User(existingUser);
     // await updatedUserToValidate.updateAndValidate(updatedUser);
-    const user: User = await UserModel.findByIdAndUpdate(id, validatedUser, { new: true });
+    const user: User = (await UserModel.findByIdAndUpdate(id, validatedUser, {
+      new: true,
+    })) as User;
     return user;
   }
 
@@ -52,11 +63,13 @@ export class UserService {
 
   async validateUser(user: any) {
     const userToValidate = new User(user);
-    try { await userToValidate.validateInstance(); }
-    catch (err) { throw new ABError({ error: err, status: 400, message: "Bad Request" }); }
+    try {
+      await userToValidate.validateInstance();
+    } catch (err) {
+      throw new ABError({ error: err, status: 400, message: "Bad Request" });
+    }
   }
 }
 
 // Exported Instance
 export const userService = new UserService();
-

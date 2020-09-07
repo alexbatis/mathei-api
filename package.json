@@ -53,10 +53,9 @@
     "request-promise": "^4.2.5",
     "source-map-support": "^0.5.16",
     "swagger-express-middleware": "^2.0.5",
-    "ts-node": "^8.8.1",
+    "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^3.8.3",
-
     "shelljs": "^0.8.3",
     "commander": "^4.1.1"
   },
