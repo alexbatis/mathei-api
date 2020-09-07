@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@typegoose/typegoose": "^6.4.0",
-    "apollo-server": "^2.11.0",
+    "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.11.0",
     "aws-sdk": "^2.650.0",
     "axios": "^0.19.2",
