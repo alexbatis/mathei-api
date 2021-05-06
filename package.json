@@ -93,7 +93,7 @@
     "nyc": "^15.0.0",
     "redux-immutable": "^4.0.0",
     "reselect": "^4.0.0",
-    "sanitize-html": "^1.22.1",
+    "sanitize-html": "^2.3.2",
     "serialize-error": "^5.0.0",
     "shallowequal": "^1.1.0",
     "supertest": "^4.0.2",
