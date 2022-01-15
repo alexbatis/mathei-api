@@ -52,7 +52,7 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "shelljs": "^0.8.3",
+    "shelljs": "^0.8.5",
     "source-map-support": "^0.5.16",
     "swagger-express-middleware": "^2.0.5",
     "ts-node": "^9.0.0",
